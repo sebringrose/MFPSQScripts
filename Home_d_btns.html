@@ -1,27 +1,27 @@
-<!-- 1. Get genre value from #genre-select on page -->
-<!-- 2. Define selectFilm function which requests FlowPlayer middleware API with duration and genre params -->
-<!-- 3. Attach selectFilm fcn to custom buttons with duration param value set for each button -->
+<!-- 1. Define selectFilm function which requests FlowPlayer middleware API with duration param -->
+<!-- 2. Attach selectFilm fcn to custom buttons with duration param value set for each button -->
 
 <script>
-    window.getGenre = () => document.querySelector("#genre-select").value;
-
-    window.selectFilm = (duration) => fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${duration},${getGenre()}`)
+    window.selectFilm = (duration) => fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${duration}`)
         .then(response => response.json())
         .then(films => {
-            if (!films[0]) return alert("No films matching genre and duration found! Please try different options.")
+            if (!films[0]) return alert("No films matching duration found! Please try different options.")
             const flowPlayerCDN = "https://cdn.flowplayer.com/25560ea8-a64d-4d29-ba98-b82eb8c82e17/"
             const film = films[Math.floor(Math.random()*films.length)]
-            window.location.href = `/player?id=${encodeURIComponent(film.name)}&t=${duration}${getGenre() ? ',' + getGenre() : ''}`
+            window.location.href = `/player?id=${encodeURIComponent(film.name)}&t=${duration}`
         })
 </script>
 <div style="display: flex; flex-wrap: wrap; justify-content: space-between; max-width: 1000px;">
     <button class="empire-btn empire-btn-round" onClick="selectFilm('5 minutes')">
         5 Mins
+        <img alt="minute-logo" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/Asset_logoBlack.png">
     </button>
     <button class="empire-btn empire-btn-round" onClick="selectFilm('10 minutes')">
         10 Mins
+        <img alt="minute-logo" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/Asset_logoBlack.png">
     </button>
     <button class="empire-btn empire-btn-round" onClick="selectFilm('20 minutes')">
         20 Mins
+        <img alt="minute-logo" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/Asset_logoBlack.png">
     </button>
 </div>
