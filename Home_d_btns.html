@@ -1,6 +1,10 @@
 <!-- 1. Define selectFilm function which requests FlowPlayer middleware API with duration param -->
 <!-- 2. Attach selectFilm fcn to custom buttons with duration param value set for each button -->
 
+<!-- Results migration: -->
+<!-- Instead of querying for films on this page the tags should be passed as url params to results page which fetches them there -->
+<!-- The loading view should then be moved to results page too -->
+
 <script>
     window.selectFilm = (duration) => fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${duration}`)
         .then(response => response.json())
