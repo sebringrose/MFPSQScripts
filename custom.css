@@ -1,4 +1,5 @@
 /* EMPIRE CUSTOM ELEMENT STYLES */
+/* legacy button styles - leave in until fully transitioned to new styles */
 .empire-custom-button {
     margin: 1rem !important; 
     font-family: Space Mono; 
@@ -17,6 +18,25 @@
     border-radius: 0;
     padding: 10px;
     margin: 20px 0;
+}
+
+/* updated button styles */
+.empire-btn {
+    margin: 1rem !important; 
+    font-family: Space Mono; 
+    font-weight: 500; 
+    font-size: 22px; 
+    letter-spacing: 2px; 
+    padding: 1.0rem; 
+    border: none; 
+    border-radius: 0.5rem;
+    background-color: #ee7500; 
+    padding: 5px 34px;
+}
+.empire-btn-round {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
 }
 #genre-select {
     /* this appearance setting disables deafult dropdown arrow for desktop browsers */
