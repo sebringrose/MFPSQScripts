@@ -1,0 +1,38 @@
+<!-- 1. Define selectFilm function which requests FlowPlayer middleware API with duration param -->
+<!-- 2. Attach selectFilm fcn to custom buttons with duration param value set for each button -->
+
+<!-- Results migration: -->
+<!-- Instead of querying for films on this page the tags should be passed as url params to results page which fetches them there -->
+<!-- The loading view should then be moved to results page too -->
+
+<script>
+    window.selectFilm = (duration) =>  {
+        document.querySelector("#loading").style.display = "flex"
+        return fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${duration}`)
+            .then(response => response.json())
+            .then(films => {
+                document.querySelector("#loading").style.display = "none"
+                if (!films[0]) return alert("No films matching that duration found! Please try a different option.")
+                const flowPlayerCDN = "https://cdn.flowplayer.com/25560ea8-a64d-4d29-ba98-b82eb8c82e17/"
+                const film = films[Math.floor(Math.random()*films.length)]
+                window.location.href = `/player?id=${encodeURIComponent(film.name)}&t=${duration}`
+            })
+    }
+</script>
+<div id="loading" style="display: none; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.4); z-index: 999;">
+    <img alt="loading" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/Asset_loadingAnimation.gif" style="max-width: 80vw; margin: auto;">
+</div>
+<div style="display: flex; width: 100%; flex-wrap: wrap; justify-content: space-around; max-width: 1000px;">
+    <button class="empire-btn empire-btn-round" onClick="selectFilm('5 minutes')">
+        5 Mins
+        <img alt="minute-logo" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/Asset_logoBlack.png">
+    </button>
+    <button class="empire-btn empire-btn-round" onClick="selectFilm('10 minutes')">
+        10 Mins
+        <img alt="minute-logo" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/Asset_logoBlack.png">
+    </button>
+    <button class="empire-btn empire-btn-round" onClick="selectFilm('20 minutes')">
+        20 Mins
+        <img alt="minute-logo" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/Asset_logoBlack.png">
+    </button>
+</div>
