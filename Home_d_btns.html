@@ -7,7 +7,7 @@
 
 <script>
     window.selectFilm = (duration) =>  {
-        document.querySelector("#loading").style.display = "block"
+        document.querySelector("#loading").style.display = "flex"
         return fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${duration}`)
             .then(response => response.json())
             .then(films => {
@@ -19,7 +19,7 @@
             })
     }
 </script>
-<div id="#loading" style="display: none; width: 100vh; height: 100vw; position: fixed; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.4)">
+<div id="loading" style="display: none; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.4); z-index: 999;">
     <img alt="loading" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/Asset_loadingAnimation.gif" style="max-width: 80vw; margin: auto;">
 </div>
 <div style="display: flex; width: 100%; flex-wrap: wrap; justify-content: space-around; max-width: 1000px;">
