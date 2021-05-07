@@ -1,0 +1,21 @@
+<!-- 1. Gets tags from URL params -->
+<!-- 2. Queries FlowPLayer middleware API for films with tags -->
+<!-- 3. Removes current film from results, alerts if none remaining -->
+<!-- 4. Picks a random film and navigates to new film link -->
+
+<script>
+    const tags = new URLSearchParams(window.location.search).get('t')
+    window.selectFilm = () => fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${tags}`)
+        .then(response => response.json())
+        .then(films => {
+            films = films.filter(film => film.name !== window.flowPlayerData.name)
+            if (!films[0]) return alert("No films matching genre and duration found! Please try different options.")
+            const film = films[Math.floor(Math.random()*films.length)]
+            window.location.href = `/player?id=${film.name}&t=${tags}`
+        })
+</script>
+<div style="display: flex; justify-content: center">
+    <button class="empire-custom-button" style="background-color: #ffb01f" onClick="selectFilm()">
+        Next
+    </button>
+</div>
