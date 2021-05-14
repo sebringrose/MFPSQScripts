@@ -61,8 +61,10 @@
     }
 }
 
+/* 
+THESE ARE NO LONGER IMPLEMENTED DUE TO DESIGN UPDATE
 #genre-select {
-    /* this appearance setting disables deafult dropdown arrow for desktop browsers */
+    // this appearance setting disables deafult dropdown arrow for desktop browsers
     appearance: none;
     display: grid;
     grid-template-areas: "select";
@@ -73,7 +75,9 @@
 } 
 #film-desc {
     font-size: 1.8rem;
-}
+} 
+*/
+
 
 /* NEWSLETTER */
 /* Newsletter font change to Monospace*/
