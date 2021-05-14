@@ -47,16 +47,16 @@
 
 <section id="info-section" style="flex-wrap: wrap-reverse;">
     <div style="flex: 1; min-width: 200px; margin: 1rem;">
-        <p id="film-tags">{tags}</p>
+        <p id="film-tags"></p>
         <h3>Share the film on:</h3>
         <div onclick="empireShareFcn()">[SHARE BUTTONS]</div>
     </div>
     <div style="flex: 3; min-width: 200px; margin: 1rem;">
         <div class="title-div">
-            <h2 id="film-title">{title}</h2>
-            <h2 id="film-director">Director - {director}</h2>
+            <h2 id="film-title"></h2>
+            <h2 id="film-director"></h2>
         </div>
-        <p id="film-desc">{desc}</p>
+        <p id="film-desc"></p>
     </div>
 </section>
 
@@ -92,15 +92,21 @@
 <!-- Optional plugins -->
 <script src="//cdn.flowplayer.com/releases/native/stable/plugins/hls.min.js"></script>
 <script>
+    // get film name from URL
     window.flowPlayerVideoId = new URLSearchParams(window.location.search).get('id')
     document.querySelector("#film-title").textContent = window.flowPlayerVideoId
+
+    // request film data via middleware
     fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&name=${encodeURIComponent(window.flowPlayerVideoId)}`)
         .then(response => response.json())
         .then(films => {
-            console.log(films)
             if (!films[0]) return alert("No film found! Please try selecting a film again.")
-            window.flowPlayerData = films[0]
+
+            // set page content with film data and call flowplayer fcn
             document.querySelector("#film-desc").textContent = films[0].description
+            document.querySelector("#film-tags").textContent = films[0].tags
+            document.querySelector("#film-director").textContent = `Director - ${films[0].additionalCustomFields.Director}`
+
             flowplayer('#player_container', {
                 src: films[0].mediafiles.m3u8_url,
                 poster: films[0].images.normal_image_url,
