@@ -1,0 +1,121 @@
+<style>
+    section {
+        width: 100%;
+        background-color: white;
+        display: flex;
+    }
+    hr {
+        height: 2px;
+        width: 95% !important;
+        border-bottom: 2px solid black !important;
+    }
+</style>
+
+<section id="player_section">
+    <div id="player_container" style="width: 100%;"></div>
+</section>
+
+<section id="info-section" style="flex-wrap: wrap-reverse;">
+    <div style="flex: 1; min-width: 200px">
+        <h4 id="film-tags">{tags}</h4>
+        <h3>Share the film on:</h3>
+        <div onclick="empireShareFcn()">[SHARE BUTTONS]</div>
+    </div>
+    <div style="flex: 3; min-width: 600px">
+        <div style="display: flex;">
+            <h2 id="film-title">{title}</h2>
+            <h2 id="film-director">Director - {director}</h2>
+        </div>
+        <p id="film-desc">{desc}</p>
+    </div>
+</section>
+
+<section>
+    <hr>
+</section>
+
+<section id="button-section">
+    <div style="flex: 1;">
+        <button class="empire-custom-button" style="background-color: #ffb01f; margin: auto;">
+            <a href="https://www.minuteshorts.co.uk/">Results</a>
+        </button>
+    </div>
+    <div style="flex: 1;">
+        <button class="empire-custom-button" style="background-color: #ffb01f; margin: auto;">
+            <a href="https://www.minuteshorts.co.uk/">Home Page</a>
+        </button>
+    </div>
+    <div style="flex: 1;">
+        <button class="empire-custom-button" style="background-color: #ffb01f; margin: auto;" onClick="selectFilm()">
+            New film
+        </button>
+    </div>
+</section>
+
+<!-- PLAYER SCRIPTS -->
+<!-- 1. Load FlowPlayer scripts -->
+<!-- 2. Retrieve "id" from page URL params -->
+<!-- 3. Call flowplayer API middleware with "id" as "name" -->
+<!-- 4. Check response valid, if so trigger FlowPlayer scripts with film data -->
+<link rel="stylesheet" href="//cdn.flowplayer.com/releases/native/stable/style/flowplayer.css">
+<script src="//cdn.flowplayer.com/releases/native/stable/flowplayer.min.js"></script>
+<!-- Optional plugins -->
+<script src="//cdn.flowplayer.com/releases/native/stable/plugins/hls.min.js"></script>
+<script>
+    window.flowPlayerVideoId = new URLSearchParams(window.location.search).get('id')
+    document.querySelector("#film-title").textContent = window.flowPlayerVideoId
+    fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&name=${encodeURIComponent(window.flowPlayerVideoId)}`)
+        .then(response => response.json())
+        .then(films => {
+            console.log(films)
+            if (!films[0]) return alert("No film found! Please try selecting a film again.")
+            window.flowPlayerData = films[0]
+            document.querySelector("#film-desc").textContent = films[0].description
+            flowplayer('#player_container', {
+                src: films[0].mediafiles.m3u8_url,
+                poster: films[0].images.normal_image_url,
+                preload: "auto",
+                token: 'eyJraWQiOiJBblJBR3VYN1lNbDkiLCJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJjIjoie1wiYWNsXCI6NCxcImlkXCI6XCJBblJBR3VYN1lNbDlcIixcImRvbWFpblwiOltcInd3dy5taW51dGVzaG9ydHMuY28udWtcIixcImp1bGlhbi12aWZvci5zcXVhcmVzcGFjZS5jb21cIl19IiwiaXNzIjoiRmxvd3BsYXllciJ9.ZQ_BBs6sCSvis4skaHIeZIyGKUSGRtaGFtix7RXZh53G1QzHN8ooMdE_N-8OcuYi_ePDeL1cAAzpPTeACQ2wAQ'
+            })
+        })
+</script>
+
+<!-- SHARE BUTTON SCRIPTS -->
+<!-- Share button and corresponding function -->
+<!-- Function simply uses inbuilt browser share method or copies url to clipboard -->
+<script>
+    window.empireShareFcn = () => {
+        if (navigator.share) {
+            navigator.share({
+                title: new URLSearchParams(window.location.search).get("title"),
+                text: new URLSearchParams(window.location.search).get("title"),
+                url: window.location.href,
+            })
+        } else {
+            const pre = document.createElement("textarea")
+            pre.textContent = window.location.href
+            document.body.appendChild(pre)
+            pre.select()
+            document.execCommand("copy")
+            pre.remove()
+            return alert("Link copied to clipboard!")
+        }
+    }
+</script>  
+
+<!-- NEXT BUTTON SCRIPT -->
+<!-- 1. Gets tags from URL params -->
+<!-- 2. Queries FlowPLayer middleware API for films with tags -->
+<!-- 3. Removes current film from results, alerts if none remaining -->
+<!-- 4. Picks a random film and navigates to new film link -->
+<script>
+    const tags = new URLSearchParams(window.location.search).get('t')
+    window.selectFilm = () => fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${tags}`)
+        .then(response => response.json())
+        .then(films => {
+            films = films.filter(film => film.name !== window.flowPlayerData.name)
+            if (!films[0]) return alert("No films matching genre and duration found! Please try different options.")
+            const film = films[Math.floor(Math.random()*films.length)]
+            window.location.href = `/player?id=${film.name}&t=${tags}`
+        })
+</script>
