@@ -54,7 +54,12 @@
     <div style="flex: 1; min-width: 200px; margin: 1rem;">
         <p id="film-tags"></p>
         <h3>Share the film on:</h3>
-        <div onclick="empireShareFcn()">[SHARE BUTTONS]</div>
+        <div class="share-icons">
+            <img alt="share-facebook" onclick="empireShareFcn('fb')" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconFacebook.svg">
+            <img alt="share-twitter" onclick="empireShareFcn('tw')" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconTwitter.png">
+            <img alt="share-reddit" onclick="empireShareFcn('rd')" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconReddit.svg">
+            <img alt="share-default" onclick="empireShareFcn()" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconShare.png">
+        </div>
     </div>
     <div style="flex: 3; min-width: 200px; margin: 1rem;">
         <div class="title-div">
@@ -139,9 +144,20 @@
 
 <!-- SHARE BUTTON SCRIPTS -->
 <!-- Share button and corresponding function -->
-<!-- Function simply uses inbuilt browser share method or copies url to clipboard -->
+<!-- Function opens pop-up for taget share or uses inbuilt browser share method (or copies url to clipboard) -->
 <script>
-    window.empireShareFcn = () => {
+    window.empireShareFcn = (platform) => {
+        const linkGenerators = {
+            fb: (link) => `https://www.facebook.com/sharer.php?u=${link}`,
+            tw: (link) => `https://twitter.com/intent/tweet?url=${link}`,
+            rd: (link) => `https://www.reddit.com/submit?url=${link}`
+        }
+
+        // if targetting platform use platform share link
+        if (platform && linkGenerators[platform]) 
+            return window.open(linkGenerators[platform](window.location.href))
+
+        // use navigator.share (or backup link copy) for general case
         if (navigator.share) {
             navigator.share({
                 title: new URLSearchParams(window.location.search).get("title"),
