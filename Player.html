@@ -44,6 +44,13 @@
         width: 32px;
         margin-right: 5px;
     }
+    .share-icons { display: flex; align-items: center; }
+    .share-icons img { 
+        margin: 5px; 
+        width: 32px; 
+        height: 32px;
+        cursor: pointer; 
+    }
 </style>
 
 <section id="player_section">
@@ -114,11 +121,11 @@
 <script src="//cdn.flowplayer.com/releases/native/stable/plugins/hls.min.js"></script>
 <script>
     // get film name from URL
-    window.flowPlayerVideoId = new URLSearchParams(window.location.search).get('id')
+    window.flowPlayerVideoId = decodeURI(new URLSearchParams(window.location.search).get('id'))
     document.querySelector("#film-title").textContent = window.flowPlayerVideoId
 
     // request film data via middleware
-    fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&name=${encodeURIComponent(window.flowPlayerVideoId)}`)
+    fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&name=${encodeURI(window.flowPlayerVideoId)}`)
         .then(response => response.json())
         .then(films => {
             if (!films[0]) return alert("No film found! Please try selecting a film again.")
@@ -147,6 +154,7 @@
 <!-- Function opens pop-up for taget share or uses inbuilt browser share method (or copies url to clipboard) -->
 <script>
     window.empireShareFcn = (platform) => {
+        const link = encodeURI(window.location.href)
         const linkGenerators = {
             fb: (link) => `https://www.facebook.com/sharer.php?u=${link}`,
             tw: (link) => `https://twitter.com/intent/tweet?url=${link}`,
@@ -155,18 +163,18 @@
 
         // if targetting platform use platform share link
         if (platform && linkGenerators[platform]) 
-            return window.open(linkGenerators[platform](window.location.href))
+            return window.open(linkGenerators[platform](link))
 
         // use navigator.share (or backup link copy) for general case
         if (navigator.share) {
             navigator.share({
-                title: new URLSearchParams(window.location.search).get("title"),
-                text: new URLSearchParams(window.location.search).get("title"),
-                url: window.location.href,
+                title: window.flowPlayerVideoId,
+                text: window.flowPlayerVideoId,
+                url: link,
             })
         } else {
             const pre = document.createElement("textarea")
-            pre.textContent = window.location.href
+            pre.textContent = link
             document.body.appendChild(pre)
             pre.select()
             document.execCommand("copy")
@@ -181,14 +189,14 @@
 <!-- 2. If results, navigate to results page with results as url param, else, load fresh results for tag that matches homepage options and nav to those -->
 <!-- this script will be reused in homepage when results page is implemented -->
 <script>
-    let results = localStorage.getItem("results")
+    let results = JSON.parse(localStorage.getItem("results"))
     window.gotoResults = () => {
         if (!results) {
             let response = await fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${window.matchingTag}&pageSize=6`)
             let films = response.json()
             results = films.map(film => film.name).join(",")
         }
-        window.location.href = `/results?films=${results}`
+        window.location.href = encodeURI(`/results?films=${results}`)
     }
 </script>
 
@@ -201,9 +209,11 @@
     window.newFilm = () => fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${window.matchingTag}&pageSize=6`)
         .then(response => response.json())
         .then(films => {
-            films = films.filter(film => film.name !== window.filmData.name)
+            console.log(films)
+            films = films.filter(film => film.name !== window.flowPlayerVideoId)
+            console.log(films)
             if (!films[0]) return alert("No films matching genre and duration found! Please try different options.")
             const film = films[Math.floor(Math.random()*films.length)]
-            window.location.href = `/player?id=${film.name}`
+            window.location.href = `/player?id=${encodeURI(film.name)}`
         })
 </script>
