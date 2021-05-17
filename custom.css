@@ -1,37 +1,20 @@
 /* EMPIRE CUSTOM ELEMENT STYLES */
-/* legacy button styles - leave in until fully transitioned to new styles */
-.empire-custom-button {
-    margin: 1rem !important; 
-    font-family: Space Mono; 
-    font-weight: 500; 
-    font-size: 22px; 
-    letter-spacing: 2px; 
-    border: none; 
-    border-radius: 0.5rem;
-    background-color: orange; 
-    padding: 5px 34px
-}
-.empire-custom-share-button {
-    background-color: white;
-    border: 1px solid black;
-    border-radius: 0;
-    padding: 10px;
-    margin: 20px 0;
-}
-
-/* updated button styles */
 .empire-btn {
     margin: 1rem !important; 
     font-family: Lato;
-    font-weight: 500;
-    font-size: 30px; 
-    letter-spacing: 2px; 
+    font-weight: 800;
+    font-size: 20px; 
     border: none; 
-    border-radius: 0.5rem;
-    background-color: #ee7500; 
-    padding: 5px 34px;
+    border-radius: 40px;
+    background-color: #ffba5c; 
+    padding: 10px 15px;
+    display: flex;
+    align-items: center;
 }
 .empire-btn-round {
+    font-family: Lato;
+    display: block;
+    font-size: 32px;
     width: 160px;
     height: 160px;
     border-radius: 50%;
@@ -39,6 +22,7 @@
     margin: 1rem !important;
   	color: white;
   	padding-top: 40px;
+    background-color: #ee7500;
     border: 5px solid #be6e1e;
 }
 .empire-btn-round img {
@@ -60,24 +44,6 @@
         transform: scale(1);
     }
 }
-
-/* 
-THESE ARE NO LONGER IMPLEMENTED DUE TO DESIGN UPDATE
-#genre-select {
-    // this appearance setting disables deafult dropdown arrow for desktop browsers
-    appearance: none;
-    display: grid;
-    grid-template-areas: "select";
-    outline: none;
-}
-#film-title {
-    font-size: 3rem;
-} 
-#film-desc {
-    font-size: 1.8rem;
-} 
-*/
-
 
 /* NEWSLETTER */
 /* Newsletter font change to Monospace*/

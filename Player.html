@@ -7,7 +7,7 @@
         flex-wrap: wrap;
     }
     h1,h2,h3,h4,p {
-        line-height: 19px !important;
+        line-height: normal !important;
         font-family: Lato !important;
         font-weight: 600 !important;
         color: #47525E !important;
@@ -34,10 +34,15 @@
     .button-div {
         flex: 1;
         max-width: 300px;
+        min-width: 150px;
         margin: 1rem;
         display: flex;
         align-items: center;
         justify-content: center;
+    }
+    .empire-btn img {
+        width: 32px;
+        margin-right: 5px;
     }
 </style>
 
@@ -66,21 +71,32 @@
 
 <section id="button-section">
     <div class="button-div">
-        <button class="empire-custom-button">
-            <a href="https://www.minuteshorts.co.uk/">Results</a>
+        <!-- insert onclick="gotoResults()" to button when ready for results page-->
+        <button class="empire-btn" style="visibility: hidden;">
+            <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconArrowLeft.svg">
+            Results
         </button>
     </div>
     <div class="button-div">
-        <button class="empire-custom-button">
-            <a href="https://www.minuteshorts.co.uk/">Home Page</a>
+        <button class="empire-btn" onclick="window.location.href = '/'">
+            <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconHome.svg">
+            Home
         </button>
     </div>
     <div class="button-div">
-        <button class="empire-custom-button" onClick="selectFilm()">
+        <button class="empire-btn" onclick="newFilm()">
+            <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconShuffle.svg">
             New film
         </button>
     </div>
 </section>
+
+<!-- TAGS IN HOMEPAGE (comment out ones not in use)-->
+<script>
+    window.homepageTags = ["5 minutes", "10 minutes", "20 minutes"]
+    // window.homepageTags = ["indie", "rising", "award-winning"]
+    // window.homepageTags = ["romance", "art-house", "horror"]
+</script>
 
 <!-- PLAYER SCRIPTS -->
 <!-- 1. Load FlowPlayer scripts -->
@@ -101,10 +117,15 @@
         .then(response => response.json())
         .then(films => {
             if (!films[0]) return alert("No film found! Please try selecting a film again.")
+            
+            // store films on window for access in other scripts
+            window.filmData = films[0]
+            let filmTags = films[0].tags.split(",")
+            window.matchingTag = filmTags.filter(tag => window.homepageTags.some(homeTag => homeTag === tag))
 
             // set page content with film data and call flowplayer fcn
             document.querySelector("#film-desc").textContent = films[0].description
-            document.querySelector("#film-tags").textContent = films[0].tags
+            document.querySelector("#film-tags").textContent = films[0].tags.split(",").join(", ")
             document.querySelector("#film-director").textContent = `Director - ${films[0].additionalCustomFields.Director}`
 
             flowplayer('#player_container', {
@@ -139,19 +160,34 @@
     }
 </script>  
 
-<!-- NEXT BUTTON SCRIPT -->
+<!-- RESULTS BUTTON SCRIPT -->
+<!-- 1. Get prev results from localStorage -->
+<!-- 2. If results, navigate to results page with results as url param, else, load fresh results for tag that matches homepage options and nav to those -->
+<!-- this script will be reused in homepage when results page is implemented -->
+<script>
+    let results = localStorage.getItem("results")
+    window.gotoResults = () => {
+        if (!results) {
+            let response = await fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${window.matchingTag}&pageSize=6`)
+            let films = response.json()
+            results = films.map(film => film.name).join(",")
+        }
+        window.location.href = `/results?films=${results}`
+    }
+</script>
+
+<!-- NEW FILM BUTTON SCRIPT -->
 <!-- 1. Gets tags from URL params -->
 <!-- 2. Queries FlowPLayer middleware API for films with tags -->
 <!-- 3. Removes current film from results, alerts if none remaining -->
 <!-- 4. Picks a random film and navigates to new film link -->
 <script>
-    const tags = new URLSearchParams(window.location.search).get('t')
-    window.selectFilm = () => fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${tags}`)
+    window.newFilm = () => fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${window.matchingTag}&pageSize=6`)
         .then(response => response.json())
         .then(films => {
-            films = films.filter(film => film.name !== window.flowPlayerData.name)
+            films = films.filter(film => film.name !== window.filmData.name)
             if (!films[0]) return alert("No films matching genre and duration found! Please try different options.")
             const film = films[Math.floor(Math.random()*films.length)]
-            window.location.href = `/player?id=${film.name}&t=${tags}`
+            window.location.href = `/player?id=${film.name}`
         })
 </script>
