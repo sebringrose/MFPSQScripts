@@ -121,7 +121,7 @@
 <script src="//cdn.flowplayer.com/releases/native/stable/plugins/hls.min.js"></script>
 <script>
     // get film name from URL
-    window.flowPlayerVideoId = decodeURI(new URLSearchParams(window.location.search).get('id'))
+    window.flowPlayerVideoId = decodeURIComponent(new URLSearchParams(window.location.search).get('id'))
     document.querySelector("#film-title").textContent = window.flowPlayerVideoId
 
     // request film data via middleware
@@ -185,23 +185,19 @@
 </script>  
 
 <!-- RESULTS BUTTON SCRIPT -->
-<!-- 1. Get prev results from localStorage -->
-<!-- 2. If results, navigate to results page with results as url param, else, load fresh results for tag that matches homepage options and nav to those -->
+<!-- 1. Get previous tag from localStorage -->
+<!-- 2. If previous tg exists, navigate to results page with previous tag as url param, else, find matching homepage tag and use that -->
 <!-- this script will be reused in homepage when results page is implemented -->
 <script>
-    let results = JSON.parse(localStorage.getItem("results"))
+    let prevTag = localStorage.getItem("results") ? JSON.parse(localStorage.getItem("results")).tag : null
     window.gotoResults = () => {
-        if (!results) {
-            let response = await fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${window.matchingTag}&pageSize=6`)
-            let films = response.json()
-            results = films.map(film => film.name).join(",")
-        }
-        window.location.href = encodeURI(`/results?films=${results}`)
+        if (!prevTag) window.location.href = `/results?t=${encodeURIComponent(window.matchingTag)}`
+        window.location.href = `/results?films=${encodeURIComponent(prevTag)}`
     }
 </script>
 
 <!-- NEW FILM BUTTON SCRIPT -->
-<!-- 1. Gets tags from URL params -->
+<!-- 1. Gets tag from URL params -->
 <!-- 2. Queries FlowPLayer middleware API for films with tags -->
 <!-- 3. Removes current film from results, alerts if none remaining -->
 <!-- 4. Picks a random film and navigates to new film link -->
@@ -214,6 +210,6 @@
             console.log(films)
             if (!films[0]) return alert("No films matching genre and duration found! Please try different options.")
             const film = films[Math.floor(Math.random()*films.length)]
-            window.location.href = `/player?id=${encodeURI(film.name)}`
+            window.location.href = `/player?id=${encodeURIComponent(film.name)}`
         })
 </script>
