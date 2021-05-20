@@ -1,10 +1,84 @@
 <style>
     @media only screen and (min-width: 1200px) {
         #siteWrapper {
-            background-image: url('https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_bgScene.jpeg');
+            background-image: 
+                linear-gradient(#21212150, #21212150),
+                url('https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_bgScene.jpeg');
             background-repeat: no-repeat;
             background-position: top;
             background-size: contain;
         }
     }
+    section {
+        width: 100%;
+        max-width: 100%;
+        display: flex;
+        flex-wrap: wrap;
+    }
+    section h1, section h2, section h3, section h4, section p {
+        line-height: normal !important;
+        font-family: Lato !important;
+        font-weight: 600 !important;
+        color: white !important;
+    }
+    section p {
+        font-size: 15px !important;
+    }
+    section hr {
+        width: calc(100% - 2rem) !important;
+        border: none !important;
+        border-bottom: 2px solid black !important;
+    }
+    section h2 {
+        margin: 1em .5rem .5em !important;
+    }
+    .title-div {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+    }
+    #film-desc {
+        margin: .5rem;
+    }
+    .button-div {
+        flex: 1;
+        max-width: 300px;
+        min-width: 150px;
+        margin: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .empire-btn img {
+        width: 32px;
+        margin-right: 5px;
+    }
 </style>
+
+<section id="title-section">
+    <h1 style="margin: auto;">Selected: </h1>
+</section>
+
+<section id="carousel-section" style="flex-wrap: wrap;">
+</section>
+
+<section id="button-section">
+    <div class="button-div">
+        <button class="empire-btn" onclick="window.location.href = '/'">
+            <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconHome.svg">
+            Home
+        </button>
+    </div>
+    <div class="button-div">
+        <button class="empire-btn" onclick="shuffleFilms()">
+            Shuffle again
+            <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconShuffle.svg">
+        </button>
+    </div>
+</section>
+
+<script>
+    const shuffleFilms = () => {
+        console.log('shufflin')
+    }
+</script>
