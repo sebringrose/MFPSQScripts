@@ -6,32 +6,8 @@
 <!-- The loading view should then be moved to results page too -->
 
 <script>
-    window.selectFilm = (tag) =>  {
-        // this fcn will become the following when results page implemented:
-        // fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${tag}&pageSize=6`)
-        //     .then((response) => response.json())
-        //     .then((films) => {
-        //         results = films.map(film => film.name).join(",")
-        //         localStorage.setItem("results", JSON.stringify(results))
-        //         window.location.href = encodeURI(`/results?films=${results}`)
-        //     })
-
-
-        document.querySelector("#loading").style.display = "flex"
-        return fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${tag}`)
-            .then(response => response.json())
-            .then(films => {
-                document.querySelector("#loading").style.display = "none"
-                if (!films[0]) return alert("No films matching that mood found! Please try a different option.")
-                const flowPlayerCDN = "https://cdn.flowplayer.com/25560ea8-a64d-4d29-ba98-b82eb8c82e17/"
-                const film = films[Math.floor(Math.random()*films.length)]
-                window.location.href = `/player?id=${encodeURI(film.name)}`
-            })
-    }
+    window.selectFilm = (tag) => window.location.href = `/results?t=${encodeURIComponent(tag)}`
 </script>
-<div id="loading" style="display: none; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.4); z-index: 999;">
-    <img alt="loading" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_loadingAnimation.gif" style="max-width: 80vw; margin: auto;">
-</div>
 <div style="display: flex; width: 100%; flex-wrap: wrap; justify-content: space-around; max-width: 1000px;">
     <button class="empire-btn-round" onClick="selectFilm('romance')">
         Loved

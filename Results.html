@@ -55,8 +55,12 @@
     }
 </style>
 
-<section id="title-section">
-    <h1 style="margin: auto;">Selected: </h1>
+<div id="loading" style="display: none; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.4); z-index: 999;">
+    <img alt="loading" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_loadingAnimation.gif" style="max-width: 80vw; margin: auto;">
+</div>
+
+<section id="selected-section">
+    <h1 id="selected-title" style="margin: auto;">Selected: </h1>
 </section>
 
 <section id="carousel-section" style="flex-wrap: wrap;">
@@ -70,7 +74,7 @@
         </button>
     </div>
     <div class="button-div">
-        <button class="empire-btn" onclick="shuffleFilms()">
+        <button class="empire-btn" onclick="populatePage()">
             Shuffle again
             <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconShuffle.svg">
         </button>
@@ -78,7 +82,36 @@
 </section>
 
 <script>
-    const shuffleFilms = () => {
-        console.log('shufflin')
+    const populatePage = async () => {
+        // display loading animation
+        document.querySelector("#loading").style.display = "flex"
+
+        // get tag from URL and write to selected-title
+        const tag = decodeURIComponent(new URLSearchParams(window.location.search).get('t'))
+        document.querySelector("#selected-title").textContent = tag
+
+        // fetches set of film trailers that match tag
+        let films = await fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${encodeURIComponent(tag)},film_trailer&pageSize=6`)
+            .then(response => response.json())
+
+        // alert user if no matching films found
+        if (!films[0]) alert("No films matching supplied tag found! Please go to home page and try another option.")
+        
+        // remove any repeat results
+        let prevFilms = localStorage.getItem('results') ? JSON.parse(localStorage.getItem('results')).films : null
+        if (prevFilms) films.filter(film => prevFilms.some(prevFilm => film.name !== prevFilm.name))
+
+        // store tag and film results in localStorage.
+        // this is used to make sure not to display repeat options on shuffle
+        // and to correctly route back to same results from player page.
+        localStorage.setItem('results', JSON.stringify({ tag, films }))
+
+        // hide loading animation
+        document.querySelector("#loading").style.display = "none"
+
+        console.log(films)
     }
+    
+    // initial page load
+    populatePage()
 </script>
