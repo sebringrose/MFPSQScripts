@@ -1,21 +1,14 @@
-<!-- 1. Define selectFilm function which requests FlowPlayer middleware API with duration param -->
-<!-- 2. Attach selectFilm fcn to custom buttons with duration param value set for each button -->
-
-<!-- Results migration: -->
-<!-- Instead of querying for films on this page the tags should be passed as url params to results page which fetches them there -->
-<!-- The loading view should then be moved to results page too -->
-
 <script>
-    window.selectFilm = (tag) => window.location.href = `/results?t=${encodeURIComponent(tag)}`
+    window.selectTag = (tag) => window.location.href = `/results?t=${encodeURIComponent(tag)}`
 </script>
 <div style="display: flex; width: 100%; flex-wrap: wrap; justify-content: space-around; max-width: 1000px;">
-    <button class="empire-btn-round" onClick="selectFilm('romance')">
+    <button class="empire-btn-round" onClick="selectTag('romance')">
         Loved
     </button>
-    <button class="empire-btn-round" onClick="selectFilm('art-house')">
+    <button class="empire-btn-round" onClick="selectTag('art-house')">
         Inspired
     </button>
-    <button class="empire-btn-round" onClick="selectFilm('horror')">
+    <button class="empire-btn-round" onClick="selectTag('horror')">
         Afraid
     </button>
 </div>

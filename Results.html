@@ -64,6 +64,9 @@
 </section>
 
 <section id="carousel-section" style="flex-wrap: wrap;">
+    <button onclick="selectFilm('A World Between Women Teaser Trailer')">
+        Select Film
+    </button>
 </section>
 
 <section id="button-section">
@@ -81,14 +84,16 @@
     </div>
 </section>
 
+<!-- POPULATE PAGE CONTENT FUNCTION -->
 <script>
-    const populatePage = async () => {
-        // display loading animation
-        document.querySelector("#loading").style.display = "flex"
-
+    window.populatePage = async () => {
         // get tag from URL and write to selected-title
         const tag = decodeURIComponent(new URLSearchParams(window.location.search).get('t'))
-        document.querySelector("#selected-title").textContent = tag
+        if (!tag) return alert("No film tag provided. Please go to home page and select an option.")
+        document.querySelector("#selected-title").textContent = `Selected: ${tag}`
+
+        // display loading animation
+        document.querySelector("#loading").style.display = "flex"
 
         // fetches set of film trailers that match tag
         let films = await fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${encodeURIComponent(tag)},film_trailer&pageSize=6`)
@@ -97,9 +102,9 @@
         // alert user if no matching films found
         if (!films[0]) alert("No films matching supplied tag found! Please go to home page and try another option.")
         
-        // remove any repeat results
+        // remove any repeat results (only if we have enough results)
         let prevFilms = localStorage.getItem('results') ? JSON.parse(localStorage.getItem('results')).films : null
-        if (prevFilms) films.filter(film => prevFilms.some(prevFilm => film.name !== prevFilm.name))
+        if (prevFilms && films.length > prevFilms.length) films.filter(film => prevFilms.some(prevFilm => film.name !== prevFilm.name))
 
         // store tag and film results in localStorage.
         // this is used to make sure not to display repeat options on shuffle
@@ -114,4 +119,18 @@
     
     // initial page load
     populatePage()
+</script>
+
+<!-- SELECT FILM FUNCTION -->
+<script>
+    window.selectFilm = (name) => {
+        // trailer-specific part of name
+        const trailerString = " Trailer"
+        if (!name.includes(trailerString)) return alert("Incorrect trailer name. Please contact an admin to resolve this issue.")
+        
+        // remove trailer-specific name part
+        const filmName = name.slice(0, name.indexOf(trailerString))
+
+        window.location.href = `/player?id=${encodeURIComponent(filmName)}`
+    }
 </script>
