@@ -109,6 +109,19 @@
         justify-content: center;
         align-items: center;
     }
+    #trailer-popup {
+        max-width: 560px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .close-button {
+        cursor: pointer;
+        width: 27px;
+        height: 27px;
+    }
 </style>
 
 <section id="selected-section">
@@ -181,22 +194,24 @@
 </template>
 
 <template id="overlay-trailer">
-    <button style="align-self: flex-end;" onclick="overlay('hide')">close</button>
-    <div>
-        PLAYER WILL GO HERE
-    </div>
-    <div>
-        <div class="button-div">
-            <button class="empire-btn" onclick="selectFilm()">
-                <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconHome.svg">
-                Play full film
-            </button>
+    <div id="trailer-popup">
+        <img class="close-button" alt="close" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_closeIcon.png" style="align-self: flex-end;" onclick="overlay('hide')">
+        <div>
+            PLAYER WILL GO HERE
         </div>
-        <div class="button-div">
-            <button class="empire-btn" onclick="populatePage()">
-                Shuffle again
-                <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_searchIcon.png">
-            </button>
+        <div>
+            <div class="button-div">
+                <button class="empire-btn" onclick="selectFilm()">
+                    <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_sPlayIcon.png">
+                    Play full film
+                </button>
+            </div>
+            <div class="button-div">
+                <button class="empire-btn" onclick="populatePage()">
+                    <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_saveIcon.png">
+                    Save for later
+                </button>
+            </div>
         </div>
     </div>
 </template>
