@@ -51,7 +51,7 @@
         justify-content: center;
     }
     .empire-btn img {
-        width: 32px;
+        height: 32px;
         margin-right: 5px;
     }
     .carousel-arrow {
@@ -118,6 +118,7 @@
         align-items: center;
     }
     .close-button {
+        filter: invert(1);
         cursor: pointer;
         width: 27px;
         height: 27px;
@@ -199,16 +200,16 @@
         <div>
             PLAYER WILL GO HERE
         </div>
-        <div>
+        <div style="display: flex;">
             <div class="button-div">
                 <button class="empire-btn" onclick="selectFilm()">
-                    <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_sPlayIcon.png">
+                    <img alt="play" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_sPlayIcon.png">
                     Play full film
                 </button>
             </div>
             <div class="button-div">
-                <button class="empire-btn" onclick="populatePage()">
-                    <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_saveIcon.png">
+                <button class="empire-btn" onclick="">
+                    <img alt="save" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_saveIcon.png">
                     Save for later
                 </button>
             </div>
@@ -220,15 +221,22 @@
 <script>
     window.overlay = (templateId) => {
         const overlaySection = document.querySelector("#overlay-section")
+        let otherSections = Array.from(document.getElementsByTagName("section"))
+        otherSections = otherSections.filter(section => section.id !== "overlay-section")
+
         if (templateId === "hide") {
+            document.body.style.overflow = "scroll"
             overlaySection.innerHTML = ""
-            return overlaySection.style.display = "none"
+            overlaySection.style.display = "none"
+            return otherSections.forEach(section => section.style.visibility = "visible")
         }
         
         const overlayContent = document.querySelector(templateId)
         if (overlayContent && overlayContent.content) {
             overlaySection.append(overlayContent.content.cloneNode(true))
-            overlaySection.style.display = "flex"
+            document.body.style.overflow = "hidden"
+            otherSections.forEach(section => section.style.visibility = "hidden")
+            return overlaySection.style.display = "flex"
         }
     }
 </script>
