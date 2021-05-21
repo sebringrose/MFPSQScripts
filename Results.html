@@ -95,11 +95,21 @@
         padding: 5px;
     }
     .info * { margin: 5px auto; }
+    #overlay-section {
+        display: none;
+        flex-direction: column;
+        max-width: 100vw;
+        width: 100vw;
+        height: 100vh;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: rgba(0, 0, 0, 0.4);
+        z-index: 999;
+        justify-content: center;
+        align-items: center;
+    }
 </style>
-
-<div id="loading" style="display: none; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.4); z-index: 999;">
-    <img alt="loading" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_loadingAnimation.gif" style="max-width: 80vw; margin: auto;">
-</div>
 
 <section id="selected-section">
     <h1 id="selected-title" style="margin: 20px auto;">You Selected: </h1>
@@ -162,18 +172,62 @@
     </div>
 </section>
 
+<section id="overlay-section">
+</section>
+
+<!-- Overlay templates -->
+<template id="overlay-loading">
+    <img alt="loading" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_loadingAnimation.gif" style="max-width: 80vw;">
+</template>
+
+<template id="overlay-trailer">
+    <button style="align-self: flex-end;" onclick="overlay('hide')">close</button>
+    <div>
+        PLAYER WILL GO HERE
+    </div>
+    <div>
+        <div class="button-div">
+            <button class="empire-btn" onclick="selectFilm()">
+                <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconHome.svg">
+                Play full film
+            </button>
+        </div>
+        <div class="button-div">
+            <button class="empire-btn" onclick="populatePage()">
+                Shuffle again
+                <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_searchIcon.png">
+            </button>
+        </div>
+    </div>
+</template>
+
+<!-- Overlay controller -->
+<script>
+    window.overlay = (templateId) => {
+        const overlaySection = document.querySelector("#overlay-section")
+        if (templateId === "hide") {
+            overlaySection.innerHTML = ""
+            return overlaySection.style.display = "none"
+        }
+        
+        const overlayContent = document.querySelector(templateId)
+        if (overlayContent && overlayContent.content) {
+            overlaySection.append(overlayContent.content.cloneNode(true))
+            overlaySection.style.display = "flex"
+        }
+    }
+</script>
+
 <!-- POPULATE PAGE CONTENT FUNCTION -->
 <script>
     window.populatePage = async () => {
-        const trailerString = " Trailer"
-
         // get tag from URL and write to selected-title
         const tagParam = decodeURIComponent(new URLSearchParams(window.location.search).get('t'))
         if (!tagParam || tagParam === "null") return alert("No film tag provided. Please go to home page and select an option.")
         document.querySelector("#selected-title").textContent = `You Selected: ${tagParam}`
 
         // display loading animation
-        document.querySelector("#loading").style.display = "flex"
+        overlay("#overlay-loading")
 
         // fetches set of film trailers that match tag
         let films = await fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${encodeURIComponent(tagParam)},film_trailer&pageSize=6`)
@@ -192,7 +246,7 @@
         localStorage.setItem('results', JSON.stringify({ tagParam, films }))
 
         // hide loading animation
-        document.querySelector("#loading").style.display = "none"
+        overlay("hide")
 
         // write film data into carousel items
         for (let i=0; i<3; i++) {
@@ -203,7 +257,10 @@
 
             const poster = document.querySelector(`#result-${i+1}-poster`)
             poster.style.backgroundImage = `url(${films[i].images.normal_image_url})`
-            poster.onclick = () => window.location.href = `/player?id=${encodeURIComponent(films[i].name.slice(0, films[i].name.indexOf(trailerString)))}`
+            poster.onclick = () => {
+                window.selectedFilm = films[i]
+                overlay("#overlay-trailer")
+            }
 
             const title = document.querySelector(`#result-${i+1}-title`)
             title.textContent = films[i].name
@@ -228,7 +285,9 @@
 
 <!-- SELECT FILM FUNCTION -->
 <script>
-    window.selectFilm = (name) => {
+    window.selectFilm = () => {
+        const name = selectedFilm.name
+
         // trailer-specific part of name
         const trailerString = " Trailer"
         if (!name.includes(trailerString)) return alert("Incorrect trailer name. Please contact an admin to resolve this issue.")
