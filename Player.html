@@ -206,7 +206,7 @@
 <!-- 2. If previous tg exists, navigate to results page with previous tag as url param, else, find matching homepage tag and use that -->
 <!-- this script will be reused in homepage when results page is implemented -->
 <script>
-    let prevTag = localStorage.getItem("results") ? JSON.parse(localStorage.getItem("results")).tag : null
+    let prevTag = localStorage.getItem("results") ? JSON.parse(localStorage.getItem("results")).tagParam : null
     window.gotoResults = () => {
         if (!prevTag) window.location.href = `/results?t=${encodeURIComponent(window.matchingTag)}`
         window.location.href = `/results?films=${encodeURIComponent(prevTag)}`
