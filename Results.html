@@ -18,6 +18,9 @@
     }
 
     /* PAGE STYLES */
+    #page {
+        max-width: 1500px;
+    }
     section {
         width: 100%;
         max-width: 100%;
@@ -67,6 +70,40 @@
         cursor: pointer;
         filter: brightness(0) saturate(100%) invert(90%) sepia(10%) saturate(4680%) hue-rotate(316deg) brightness(105%) contrast(110%);
     }
+    #carousel-items {
+        flex: 1; 
+        display: flex; 
+        justify-content: space-around;
+        flex-wrap: wrap;
+    }
+    .carousel-item {
+        width: 300px;
+    }
+    .film-poster {
+        height: 200px;
+        box-sizing: content-box;
+        border: 4px solid black;
+        background-color: black;
+        border-radius: 26px;
+    }
+    .film-poster img {
+        position: relative;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        height: 100px;
+        cursor: pointer;
+        filter: brightness(0) saturate(100%) invert(100%) sepia(66%) saturate(66%) hue-rotate(213deg) brightness(117%) contrast(100%);
+    }
+    .film-info { 
+        background-color: rgba(52, 63, 75, 0.57); 
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 10px auto;
+    }
+    .film-info p { margin: 5px auto; }
+    .film-info b { font-weight: 900; }
 </style>
 
 <div id="loading" style="display: none; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.4); z-index: 999;">
@@ -77,14 +114,38 @@
     <h1 id="selected-title" style="margin: auto;">You Selected: </h1>
 </section>
 
-<section id="carousel-section" style="flex-wrap: wrap;">
+<section id="carousel-section">
     <div id="carousel-left-arrow">
         <img onclick="populatePage()" class="carousel-arrow" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_chevron.png" alt="left-arrow" style="transform: rotate(90deg);">
     </div>
-    <div id="carousel-items" style="flex: 1;">
-        <button onclick="selectFilm('A World Between Women Teaser Trailer')">
-            Select Film
-        </button>
+    <div id="carousel-items">
+        <div id="result-1" class="carousel-item">
+            <div id="result-1-poster" class="film-poster">
+                <img src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_playIcon.png" alt="play">
+            </div>
+            <div class="film-info">
+                <p id="result-1-title"><b>...</b></p>
+                <p id="result-1-tags">...</p>
+            </div>
+        </div>
+        <div id="result-2" class="carousel-item">
+            <div id="result-2-poster" class="film-poster">
+                <img src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_playIcon.png" alt="play">
+            </div>
+            <div class="film-info">
+                <p id="result-2-title"><b>...</b></p>
+                <p id="result-2-tags">...</p>
+            </div>
+        </div>
+        <div id="result-3" class="carousel-item">
+            <div id="result-3-poster" class="film-poster" onclick="selectFilm('A World Between Women Teaser Trailer')">
+                <img src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_playIcon.png" alt="play">
+            </div>
+            <div class="film-info">
+                <p id="result-3-title"><b>...</b></p>
+                <p id="result-3-tags">...</p>
+            </div>
+        </div>
     </div>
     <div id="carousel-right-arrow">
         <img onclick="populatePage()" class="carousel-arrow" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_chevron.png" alt="left-arrow" style="transform: rotate(270deg);">
