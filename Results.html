@@ -1,4 +1,7 @@
 <style>
+    #siteWrapper {
+        background: black;
+    }
     @media only screen and (min-width: 1200px) {
         #siteWrapper {
             background-image: 
@@ -53,6 +56,10 @@
         width: 32px;
         margin-right: 5px;
     }
+    .carousel-arrow {
+        cursor: pointer;
+        filter: brightness(0) saturate(100%) invert(90%) sepia(10%) saturate(4680%) hue-rotate(316deg) brightness(105%) contrast(110%);
+    }
 </style>
 
 <div id="loading" style="display: none; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.4); z-index: 999;">
@@ -60,10 +67,19 @@
 </div>
 
 <section id="selected-section">
-    <h1 id="selected-title" style="margin: auto;">Selected: </h1>
+    <h1 id="selected-title" style="margin: auto;">You Selected: </h1>
 </section>
 
 <section id="carousel-section" style="flex-wrap: wrap;">
+    <div id="carousel-left-arrow">
+        <img onclick="populatePage()" class="carousel-arrow" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_chevron.png" alt="left-arrow" style="transform: rotate(90deg);">
+    </div>
+    <div id="carousel-items" style="flex: 1;">
+
+    </div>
+    <div id="carousel-right-arrow">
+        <img onclick="populatePage()" class="carousel-arrow" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_chevron.png" alt="left-arrow" style="transform: rotate(270deg);">
+    </div>
     <button onclick="selectFilm('A World Between Women Teaser Trailer')">
         Select Film
     </button>
@@ -89,8 +105,8 @@
     window.populatePage = async () => {
         // get tag from URL and write to selected-title
         const tag = decodeURIComponent(new URLSearchParams(window.location.search).get('t'))
-        if (!tag) return alert("No film tag provided. Please go to home page and select an option.")
-        document.querySelector("#selected-title").textContent = `Selected: ${tag}`
+        if (!!tag) return alert("No film tag provided. Please go to home page and select an option.")
+        document.querySelector("#selected-title").textContent = `You Selected: ${tag}`
 
         // display loading animation
         document.querySelector("#loading").style.display = "flex"
