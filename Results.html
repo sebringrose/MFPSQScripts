@@ -30,33 +30,21 @@
     section h1, section h2, section h3, section h4, section p {
         line-height: normal !important;
         font-family: Lato !important;
-        font-weight: 600 !important;
         color: white !important;
+    }
+    section h1, section h2, section h3, section h4 {
+        font-weight: 600 !important;
     }
     section p {
         font-size: 15px !important;
     }
-    section hr {
-        width: calc(100% - 2rem) !important;
-        border: none !important;
-        border-bottom: 2px solid black !important;
-    }
-    section h2 {
-        margin: 1em .5rem .5em !important;
-    }
-    .title-div {
-        display: flex;
-        justify-content: space-between;
-        flex-wrap: wrap;
-    }
-    #film-desc {
-        margin: .5rem;
+    #button-section {
+        justify-content: center;
     }
     .button-div {
-        flex: 1;
         max-width: 300px;
         min-width: 150px;
-        margin: 1rem;
+        margin: 0 1rem 1rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -67,6 +55,7 @@
     }
     .carousel-arrow {
         height: 100px;
+        margin-top: 50px;
         cursor: pointer;
         filter: brightness(0) saturate(100%) invert(90%) sepia(10%) saturate(4680%) hue-rotate(316deg) brightness(105%) contrast(110%);
     }
@@ -81,9 +70,9 @@
     }
     .film-poster {
         height: 200px;
-        box-sizing: content-box;
-        border: 4px solid black;
-        background-color: black;
+        box-sizing: border-box;
+        border: 10px solid black;
+        background-color: darkgrey;
         border-radius: 26px;
     }
     .film-poster img {
@@ -91,19 +80,19 @@
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
-        height: 100px;
+        height: 70px;
         cursor: pointer;
         filter: brightness(0) saturate(100%) invert(100%) sepia(66%) saturate(66%) hue-rotate(213deg) brightness(117%) contrast(100%);
     }
-    .film-info { 
+    .info { 
         background-color: rgba(52, 63, 75, 0.57); 
         display: flex;
         flex-direction: column;
         align-items: center;
-        margin: 10px auto;
+        margin: 5px auto;
+        padding: 5px;
     }
-    .film-info p { margin: 5px auto; }
-    .film-info b { font-weight: 900; }
+    .info * { margin: 5px auto; }
 </style>
 
 <div id="loading" style="display: none; width: 100vw; height: 100vh; position: fixed; top: 0; left: 0; background-color: rgba(0, 0, 0, 0.4); z-index: 999;">
@@ -111,7 +100,7 @@
 </div>
 
 <section id="selected-section">
-    <h1 id="selected-title" style="margin: auto;">You Selected: </h1>
+    <h1 id="selected-title" style="margin: 20px auto;">You Selected: </h1>
 </section>
 
 <section id="carousel-section">
@@ -123,8 +112,8 @@
             <div id="result-1-poster" class="film-poster">
                 <img src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_playIcon.png" alt="play">
             </div>
-            <div class="film-info">
-                <p id="result-1-title"><b>...</b></p>
+            <div class="info">
+                <h4 id="result-1-title">...</h4>
                 <p id="result-1-tags">...</p>
             </div>
         </div>
@@ -132,8 +121,8 @@
             <div id="result-2-poster" class="film-poster">
                 <img src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_playIcon.png" alt="play">
             </div>
-            <div class="film-info">
-                <p id="result-2-title"><b>...</b></p>
+            <div class="info">
+                <h4 id="result-2-title">...</h4>
                 <p id="result-2-tags">...</p>
             </div>
         </div>
@@ -141,8 +130,8 @@
             <div id="result-3-poster" class="film-poster" onclick="selectFilm('A World Between Women Teaser Trailer')">
                 <img src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_playIcon.png" alt="play">
             </div>
-            <div class="film-info">
-                <p id="result-3-title"><b>...</b></p>
+            <div class="info">
+                <h4 id="result-3-title">...</h4>
                 <p id="result-3-tags">...</p>
             </div>
         </div>
@@ -150,6 +139,10 @@
     <div id="carousel-right-arrow">
         <img onclick="populatePage()" class="carousel-arrow" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_chevron.png" alt="left-arrow" style="transform: rotate(270deg);">
     </div>
+</section>
+
+<section style="margin-top: 1rem;">
+    <p class="info">Press play to watch a 30 second trailer</p>
 </section>
 
 <section id="button-section">
@@ -162,7 +155,7 @@
     <div class="button-div">
         <button class="empire-btn" onclick="populatePage()">
             Shuffle again
-            <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconShuffle.svg">
+            <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_searchIcon.png">
         </button>
     </div>
 </section>
