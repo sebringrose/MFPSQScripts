@@ -45,7 +45,6 @@
     .button-div {
         max-width: 300px;
         min-width: 150px;
-        margin: 0 1rem 1rem;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -59,6 +58,11 @@
         margin-top: 50px;
         cursor: pointer;
         filter: brightness(0) saturate(100%) invert(90%) sepia(10%) saturate(4680%) hue-rotate(316deg) brightness(105%) contrast(110%);
+    }
+    @media only screen and (max-width: 600px) {
+        .carousel-arrow {
+            display: none;
+        }
     }
     #carousel-items {
         flex: 1; 
@@ -100,6 +104,7 @@
         flex-direction: column;
         max-width: 100vw;
         width: 100vw;
+        max-height: 100vh;
         height: 100vh;
         position: fixed;
         top: 0;
@@ -112,9 +117,11 @@
     #trailer-popup {
         max-width: 560px;
         width: 100%;
+        height: calc(100% - 132px);
+        padding-top: 132px;
+        overflow: auto;
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
     }
     .close-button {
@@ -124,8 +131,8 @@
         height: 27px;
     }
     #trailer_container {
-        width: 100%;
-        height: 100%;
+        width: 100vw;
+        height: 41.5vw;
         max-width: 564px;
         max-height: 234px;
         border: 5px solid white;
@@ -137,13 +144,33 @@
         width: 100%;
         height: 100%;
     }
+    #save-box-container {
+        width: 100%;
+        max-width: 500px;
+        display: flex;
+        flex-direction: column;
+    }
+    #save-box {
+        background-color: #FFFFFF;
+        border-radius: 25px;
+        opacity: 0.9;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 1rem 0;
+    }
+    #save-box * {
+        color: black !important;
+    }
 </style>
 
 <section id="selected-section">
     <h1 id="selected-title" style="margin: 20px auto;">You Selected: </h1>
 </section>
 
-<section id="carousel-section">
+<section id="carousel-section" style="flex-wrap: nowrap;">
     <div id="carousel-left-arrow">
         <img onclick="populatePage()" class="carousel-arrow" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_chevron.png" alt="left-arrow" style="transform: rotate(90deg);">
     </div>
@@ -209,7 +236,7 @@
 </template>
 
 <template id="overlay-trailer">
-    <div id="trailer-popup">
+    <section id="trailer-popup">
         <img class="close-button" alt="close" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_closeIcon.png" style="align-self: flex-end;" onclick="overlay('hide')">
 
         <div id="trailer_container">
@@ -224,13 +251,25 @@
                 </button>
             </div>
             <div class="button-div">
-                <button class="empire-btn" onclick="">
+                <button class="empire-btn" onclick="toggleSaveBox()">
                     <img alt="save" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_saveIcon.png">
                     Save for later
                 </button>
             </div>
         </div>
-    </div>
+
+        <div id="save-box-container" style="visibility: hidden;">
+            <img class="close-button" alt="close" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_closeIcon.png" style="align-self: flex-end;" onclick="toggleSaveBox()">
+            <div id="save-box">
+                <h1 id="save-box-title">Great choice!</h1>
+                <p id="save-box-text">Please add your email address below to save the films for later viewing</p>
+                <form id="save-box-form">
+                    <input type="email" placeholder="Email">
+                    <button type="submit">Sign up</button>
+                </form>
+            </div>
+        </div>
+    </section>
 </template>
 
 <!-- Overlay controller -->
@@ -240,8 +279,8 @@
         let otherSections = Array.from(document.getElementsByTagName("section"))
         otherSections = otherSections.filter(section => section.id !== "overlay-section")
 
-        if (templateId === "hide") {
-            document.body.style.overflow = "scroll"
+        if (!templateId || templateId === "hide") {
+            document.body.style.overflow = "auto"
             overlaySection.innerHTML = ""
             overlaySection.style.display = "none"
             otherSections.forEach(section => section.style.visibility = "visible")
@@ -250,8 +289,8 @@
         
         const overlayContent = document.querySelector(templateId)
         if (overlayContent && overlayContent.content) {
-            overlaySection.append(overlayContent.content.cloneNode(true))
             document.body.style.overflow = "hidden"
+            overlaySection.append(overlayContent.content.cloneNode(true))
             otherSections.forEach(section => section.style.visibility = "hidden")
             overlaySection.style.display = "flex"
             return callback ? callback() : null
@@ -269,15 +308,21 @@
 <script src="//cdn.flowplayer.com/releases/native/stable/plugins/hls.min.js"></script>
 <script>
     window.playSelectedTrailer = () => {
-        console.log('playing', selectedFilm)
         flowplayer('#trailer_player_container', {
             src: selectedFilm.mediafiles.m3u8_url,
             poster: selectedFilm.images.normal_image_url,
             preload: "auto",
             ratio: "564:234",
-            autoplay: true,
+            ui: 2048,
             token: 'eyJraWQiOiJBblJBR3VYN1lNbDkiLCJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJjIjoie1wiYWNsXCI6NCxcImlkXCI6XCJBblJBR3VYN1lNbDlcIixcImRvbWFpblwiOltcInd3dy5taW51dGVzaG9ydHMuY28udWtcIixcImp1bGlhbi12aWZvci5zcXVhcmVzcGFjZS5jb21cIl19IiwiaXNzIjoiRmxvd3BsYXllciJ9.ZQ_BBs6sCSvis4skaHIeZIyGKUSGRtaGFtix7RXZh53G1QzHN8ooMdE_N-8OcuYi_ePDeL1cAAzpPTeACQ2wAQ'
         })
+    }
+
+    window.toggleSaveBox = () => {
+        const saveBoxCon = document.querySelector("#save-box-container")
+        const saveBoxVis = saveBoxCon.style.visibility
+        if (saveBoxVis === "hidden") return saveBoxCon.style.visibility = "visible"
+        return saveBoxCon.style.visibility = "hidden"
     }
 </script>
 
@@ -326,7 +371,7 @@
             }
 
             const title = document.querySelector(`#result-${i+1}-title`)
-            title.textContent = films[i].name
+            title.textContent = filterTitle(films[i].name)
 
             const tags = document.querySelector(`#result-${i+1}-tags`)
             const hiddenTags = [ "film_trailer" ]
@@ -351,13 +396,14 @@
     window.selectFilm = () => {
         const name = selectedFilm.name
 
+        window.location.href = `/player?id=${encodeURIComponent(filterTitle(filmName))}`
+    }
+    window.filterTitle = (name) => {
         // trailer-specific part of name
         const trailerString = " Trailer"
         if (!name.includes(trailerString)) return alert("Incorrect trailer name. Please contact an admin to resolve this issue.")
         
         // remove trailer-specific name part
-        const filmName = name.slice(0, name.indexOf(trailerString))
-
-        window.location.href = `/player?id=${encodeURIComponent(filmName)}`
+        return name.slice(0, name.indexOf(trailerString))
     }
 </script>
