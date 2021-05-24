@@ -123,6 +123,20 @@
         width: 27px;
         height: 27px;
     }
+    #trailer_container {
+        width: 100%;
+        height: 100%;
+        max-width: 564px;
+        max-height: 234px;
+        border: 3px solid white;
+        border-radius: 25px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+    #trailer_player_container {
+        width: 100%;
+        height: 100%;
+    }
 </style>
 
 <section id="selected-section">
@@ -197,9 +211,11 @@
 <template id="overlay-trailer">
     <div id="trailer-popup">
         <img class="close-button" alt="close" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_closeIcon.png" style="align-self: flex-end;" onclick="overlay('hide')">
-        <div>
-            PLAYER WILL GO HERE
+
+        <div id="trailer_container">
+            <div id="trailer_player_container"></div>
         </div>
+        
         <div style="display: flex;">
             <div class="button-div">
                 <button class="empire-btn" onclick="selectFilm()">
@@ -219,7 +235,7 @@
 
 <!-- Overlay controller -->
 <script>
-    window.overlay = (templateId) => {
+    window.overlay = (templateId, callback) => {
         const overlaySection = document.querySelector("#overlay-section")
         let otherSections = Array.from(document.getElementsByTagName("section"))
         otherSections = otherSections.filter(section => section.id !== "overlay-section")
@@ -228,7 +244,8 @@
             document.body.style.overflow = "scroll"
             overlaySection.innerHTML = ""
             overlaySection.style.display = "none"
-            return otherSections.forEach(section => section.style.visibility = "visible")
+            otherSections.forEach(section => section.style.visibility = "visible")
+            return callback ? callback() : null
         }
         
         const overlayContent = document.querySelector(templateId)
@@ -236,8 +253,30 @@
             overlaySection.append(overlayContent.content.cloneNode(true))
             document.body.style.overflow = "hidden"
             otherSections.forEach(section => section.style.visibility = "hidden")
-            return overlaySection.style.display = "flex"
+            overlaySection.style.display = "flex"
+            return callback ? callback() : null
         }
+    }
+</script>
+
+<!-- EMBEDDED TRAILER PLAYER SCRIPT -->
+<!-- This fcn is called as a callback to overlay function when displaying player overlay content -->
+<!-- 1. Load FlowPlayer scripts -->
+<!-- 2. Use window.selectedFilm as data source for flowplayer fcn -->
+<link rel="stylesheet" href="//cdn.flowplayer.com/releases/native/stable/style/flowplayer.css">
+<script src="//cdn.flowplayer.com/releases/native/stable/flowplayer.min.js"></script>
+<!-- Optional plugins -->
+<script src="//cdn.flowplayer.com/releases/native/stable/plugins/hls.min.js"></script>
+<script>
+    window.playSelectedTrailer = () => {
+        console.log('playing', selectedFilm)
+        flowplayer('#trailer_player_container', {
+            src: selectedFilm.mediafiles.m3u8_url,
+            poster: selectedFilm.images.normal_image_url,
+            preload: "auto",
+            ratio: "564:234",
+            token: 'eyJraWQiOiJBblJBR3VYN1lNbDkiLCJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJjIjoie1wiYWNsXCI6NCxcImlkXCI6XCJBblJBR3VYN1lNbDlcIixcImRvbWFpblwiOltcInd3dy5taW51dGVzaG9ydHMuY28udWtcIixcImp1bGlhbi12aWZvci5zcXVhcmVzcGFjZS5jb21cIl19IiwiaXNzIjoiRmxvd3BsYXllciJ9.ZQ_BBs6sCSvis4skaHIeZIyGKUSGRtaGFtix7RXZh53G1QzHN8ooMdE_N-8OcuYi_ePDeL1cAAzpPTeACQ2wAQ'
+        })
     }
 </script>
 
@@ -282,7 +321,7 @@
             poster.style.backgroundImage = `url(${films[i].images.normal_image_url})`
             poster.onclick = () => {
                 window.selectedFilm = films[i]
-                overlay("#overlay-trailer")
+                overlay("#overlay-trailer", playSelectedTrailer)
             }
 
             const title = document.querySelector(`#result-${i+1}-title`)
