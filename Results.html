@@ -52,6 +52,11 @@
         align-items: center;
         justify-content: center;
     }
+    @media only screen and (max-width: 600px) {
+        .button-div * {
+            font-size: 15px !important;
+        }
+    }
     .empire-btn img {
         height: 32px;
         margin-right: 5px;
@@ -109,7 +114,7 @@
         }
     }
     .info { 
-        background-color: rgba(52, 63, 75, 0.57); 
+        background-color: rgba(52, 63, 75, 0.15); 
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -120,10 +125,10 @@
     #overlay-section {
         display: none;
         flex-direction: column;
-        max-width: calc(100vw - 2rem);
-        width: calc(100vw - 2rem);
-        max-height: calc(100vh - 2rem);
-        height: calc(100vh - 2rem);
+        max-width: 100vw;
+        width: 100vw;
+        max-height: 100vh;
+        height: 100vh;
         position: fixed;
         top: 0;
         left: 0;
@@ -131,14 +136,13 @@
         z-index: 1001;
         justify-content: center;
         align-items: center;
-        padding: 1rem;
+        overflow: auto;
     }
     #trailer-popup {
-        max-width: 564px;
-        width: 100%;
+	    max-width: 564px;
+        width: calc(100% - 2rem);
         height: 100%;
-        padding-top: 132px;
-        overflow: auto;
+        padding: 132px 1rem 50px;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -322,6 +326,12 @@
     </section>
 </template>
 
+<!-- AUTOPLAY TOGGLE -->
+<!-- Change variable value to true to enable autoplay (false to disable) -->
+<script>
+    window.autoplayTrailers = false
+</script>
+
 <!-- Overlay controller -->
 <script>
     window.overlay = (templateId, callback) => {
@@ -365,6 +375,7 @@
             preload: "auto",
             ratio: "564:234",
             ui: 2048,
+            autoplay: autoplayTrailers,
             token: 'eyJraWQiOiJBblJBR3VYN1lNbDkiLCJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJjIjoie1wiYWNsXCI6NCxcImlkXCI6XCJBblJBR3VYN1lNbDlcIixcImRvbWFpblwiOltcInd3dy5taW51dGVzaG9ydHMuY28udWtcIixcImp1bGlhbi12aWZvci5zcXVhcmVzcGFjZS5jb21cIl19IiwiaXNzIjoiRmxvd3BsYXllciJ9.ZQ_BBs6sCSvis4skaHIeZIyGKUSGRtaGFtix7RXZh53G1QzHN8ooMdE_N-8OcuYi_ePDeL1cAAzpPTeACQ2wAQ'
         })
 
