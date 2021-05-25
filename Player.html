@@ -92,8 +92,7 @@
 
 <section id="button-section">
     <div class="button-div">
-        <!-- insert onclick="gotoResults()" to button when ready for results page-->
-        <button class="empire-btn" style="visibility: hidden;">
+        <button class="empire-btn" onclick="gotoResults()">
             <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_iconArrowLeft.svg">
             Results
         </button>
@@ -198,10 +197,10 @@
 <!-- 2. If previous tg exists, navigate to results page with previous tag as url param, else, find matching homepage tag and use that -->
 <!-- this script will be reused in homepage when results page is implemented -->
 <script>
-    let prevTag = localStorage.getItem("results") ? JSON.parse(localStorage.getItem("results")).tagParam : null
+    let prevTag = localStorage.getItem("results") ? JSON.parse(localStorage.getItem("results")).tag : null
     window.gotoResults = () => {
         if (!prevTag) window.location.href = `/results?t=${encodeURIComponent(window.matchingTag)}`
-        window.location.href = `/results?films=${encodeURIComponent(prevTag)}`
+        window.location.href = `/results?t=${encodeURIComponent(prevTag)}`
     }
 </script>
 

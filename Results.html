@@ -39,6 +39,9 @@
     section p {
         font-size: 15px !important;
     }
+    #selected-section {
+        flex-direction: column;
+    }
     #button-section {
         justify-content: center;
     }
@@ -59,9 +62,12 @@
         cursor: pointer;
         filter: brightness(0) saturate(100%) invert(90%) sepia(10%) saturate(4680%) hue-rotate(316deg) brightness(105%) contrast(110%);
     }
+    .hide-mobile {
+        display: flex;
+    }
     @media only screen and (max-width: 600px) {
-        .carousel-arrow {
-            display: none;
+        .hide-mobile {
+            display: none !important;
         }
     }
     #carousel-items {
@@ -89,6 +95,18 @@
         height: 70px;
         cursor: pointer;
         filter: brightness(0) saturate(100%) invert(100%) sepia(66%) saturate(66%) hue-rotate(213deg) brightness(117%) contrast(100%);
+    }
+    #info-section {
+        flex-direction: column;
+        align-items: center;
+    }
+    .only-mobile {
+        display: flex;
+    }
+    @media only screen and (min-width: 600px) {
+        .only-mobile {
+            display: none !important;
+        }
     }
     .info { 
         background-color: rgba(52, 63, 75, 0.57); 
@@ -190,11 +208,12 @@
 
 <section id="selected-section">
     <h1 id="selected-title" style="margin: 20px auto;">You Selected: </h1>
+    <p class="info only-mobile">Press play to watch a 30 second trailer</p>
 </section>
 
 <section id="carousel-section" style="flex-wrap: nowrap;">
-    <div id="carousel-left-arrow">
-        <img onclick="populatePage()" class="carousel-arrow" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_chevron.png" alt="left-arrow" style="transform: rotate(90deg);">
+    <div id="carousel-left-arrow" class="hide-mobile">
+        <img onclick="populatePage({ new: true })" class="carousel-arrow" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_chevron.png" alt="left-arrow" style="transform: rotate(90deg);">
     </div>
     <div id="carousel-items">
         <div id="result-1" class="carousel-item">
@@ -225,13 +244,21 @@
             </div>
         </div>
     </div>
-    <div id="carousel-right-arrow">
-        <img onclick="populatePage()" class="carousel-arrow" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_chevron.png" alt="left-arrow" style="transform: rotate(270deg);">
+    <div id="carousel-right-arrow" class="hide-mobile">
+        <img onclick="populatePage({ new: true })" class="carousel-arrow" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_chevron.png" alt="left-arrow" style="transform: rotate(270deg);">
     </div>
 </section>
 
-<section style="margin-top: 1rem;">
-    <p class="info">Press play to watch a 30 second trailer</p>
+<section id="info-section">
+    <div class="only-mobile">
+        <div class="carousel-left-arrow">
+            <img onclick="populatePage({ new: true })" class="carousel-arrow" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_chevron.png" alt="left-arrow" style="transform: rotate(90deg);">
+        </div>
+        <div class="carousel-right-arrow">
+            <img onclick="populatePage({ new: true })" class="carousel-arrow" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_chevron.png" alt="left-arrow" style="transform: rotate(270deg);">
+        </div>
+    </div>
+    <p class="info hide-mobile">Press play to watch a 30 second trailer</p>
 </section>
 
 <section id="button-section">
@@ -242,7 +269,7 @@
         </button>
     </div>
     <div class="button-div">
-        <button class="empire-btn" onclick="populatePage()">
+        <button class="empire-btn" onclick="populatePage({ shuffle: true })">
             Shuffle again
             <img alt="results" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_searchIcon.png">
         </button>
@@ -373,9 +400,30 @@
     }
 </script>
 
-<!-- POPULATE PAGE CONTENT FUNCTION -->
+<!-- SELECT FILM & FILTER TITLE FUNCTION -->
 <script>
-    window.populatePage = async () => {
+    window.selectFilm = () => {
+        const name = selectedFilm.name
+
+        window.location.href = `/player?id=${encodeURIComponent(filterTitle(name))}`
+    }
+
+    window.filterTitle = (name) => {
+        // trailer-specific part of name
+        const trailerString = " Trailer"
+        if (!name.includes(trailerString)) return alert("Incorrect trailer name. Please contact an admin to resolve this issue.")
+        
+        // remove trailer-specific name part
+        return name.slice(0, name.indexOf(trailerString))
+    }
+</script>
+
+<!-- POPULATE PAGE CONTENT FUNCTIONS -->
+<!-- Takes config object as argument: -->
+<!-- { new: true } attribute will make sure all items are not repeats of previous results -->
+<!-- { shuffle: true } will reorder fresh film results and disregard whether a film is a repeat or not -->
+<script>
+    window.populatePage = async (config) => {
         // get tag from URL and write to selected-title
         const tagParam = decodeURIComponent(new URLSearchParams(window.location.search).get('t'))
         if (!tagParam || tagParam === "null") return alert("No film tag provided. Please go to home page and select an option.")
@@ -384,21 +432,8 @@
         // display loading animation
         overlay("#overlay-loading")
 
-        // fetches set of film trailers that match tag
-        let films = await fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${encodeURIComponent(tagParam)},film_trailer&pageSize=6`)
-            .then(response => response.json())
-        
-        // alert user if no matching films found
-        if (!films[0]) alert("No films matching supplied tag found! Please go to home page and try another option.")
-
-        // remove any repeat results (only if we have enough results)
-        let prevFilms = localStorage.getItem('results') ? JSON.parse(localStorage.getItem('results')).films : null
-        if (prevFilms && films.length > prevFilms.length) films.filter(film => prevFilms.some(prevFilm => film.name !== prevFilm.name))
-
-        // store tag and film results in localStorage.
-        // this is used to make sure not to display repeat options on shuffle
-        // and to correctly route back to same results from player page.
-        localStorage.setItem('results', JSON.stringify({ tagParam, films }))
+        let films = await getFilms(tagParam, config)
+        console.log('getFilms returned films', films)
 
         // hide loading animation
         overlay("hide")
@@ -409,6 +444,7 @@
                 document.querySelector(`#result-${i+1}`).style.display = "none"
                 continue
             }
+            document.querySelector(`#result-${i+1}`).style.display = "block"
 
             const poster = document.querySelector(`#result-${i+1}-poster`)
             poster.style.backgroundImage = `url(${films[i].images.normal_image_url})`
@@ -429,25 +465,54 @@
             tags.textContent = filmTags[0] ? `(${filmTags.join(", ")})` : ""
         }
     }
+
+    window.getFilms = async (tag, config) => {
+        console.log('getting films with', config)
+        let prevFilms = localStorage.getItem('results') ? JSON.parse(localStorage.getItem('results')).films : null
+
+        // check we have valid previous films and that they match the selected tag
+        // only use previous films if config.shuffle argument === false
+        if ((!config || (!config.new && !config.shuffle)) && prevFilms && prevFilms.every(prevFilm => prevFilm && prevFilm.tags && prevFilm.tags.includes(tag))) {
+            return prevFilms
+        }
+
+        // fetches set of film trailers that match tag
+        let films = await fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${encodeURIComponent(tag)},film_trailer&pageSize=6`)
+            .then(response => response.json())
+        
+        // alert user if no matching films found
+        if (!films[0]) {
+            alert("No films matching supplied tag found! Please go to home page and try another option.")
+            return []
+        }
+
+        // shuffle order of films if shuffle config attribute is true 
+        if (config && config.shuffle) {
+            films = films.map((a) => ({sort: Math.random(), value: a}))
+                .sort((a, b) => a.sort - b.sort)
+                .map((a) => a.value)
+        }
+
+        // remove any repeat results if new config attribute is true (only if we have enough results)
+        if (config && config.new && prevFilms && prevFilms.every(prevFilm => prevFilm && prevFilm.id) && films.length > prevFilms.length) {
+            films = films.filter(film => {
+                return !prevFilms.some(prevFilm => {
+                    return film.name === prevFilm.name
+                })
+            })
+        }
+        
+        // return only 3 items
+        films.length = 3
+
+        // store tag and film results in localStorage.
+        // this is used to make sure not to display repeat options on shuffle
+        // and to correctly route back to same results from player page.
+        localStorage.setItem('results', JSON.stringify({ tag, films }))
+
+        return films
+    }
     
     // initial page load
-    populatePage()
-</script>
-
-<!-- SELECT FILM FUNCTION -->
-<script>
-    window.selectFilm = () => {
-        const name = selectedFilm.name
-
-        window.location.href = `/player?id=${encodeURIComponent(filterTitle(name))}`
-    }
-
-    window.filterTitle = (name) => {
-        // trailer-specific part of name
-        const trailerString = " Trailer"
-        if (!name.includes(trailerString)) return alert("Incorrect trailer name. Please contact an admin to resolve this issue.")
-        
-        // remove trailer-specific name part
-        return name.slice(0, name.indexOf(trailerString))
-    }
+    populatePage({ shuffle: false, new: false })
 </script>
