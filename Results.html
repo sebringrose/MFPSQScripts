@@ -102,27 +102,29 @@
     #overlay-section {
         display: none;
         flex-direction: column;
-        max-width: 100vw;
-        width: 100vw;
-        max-height: 100vh;
-        height: 100vh;
+        max-width: calc(100vw - 2rem);
+        width: calc(100vw - 2rem);
+        max-height: calc(100vh - 2rem);
+        height: calc(100vh - 2rem);
         position: fixed;
         top: 0;
         left: 0;
         background-color: rgba(0, 0, 0, 0.4);
-        z-index: 999;
+        z-index: 1001;
         justify-content: center;
         align-items: center;
+        padding: 1rem;
     }
     #trailer-popup {
-        max-width: 560px;
+        max-width: 564px;
         width: 100%;
-        height: calc(100% - 132px);
+        height: 100%;
         padding-top: 132px;
         overflow: auto;
         display: flex;
         flex-direction: column;
         align-items: center;
+        flex-wrap: nowrap;
     }
     .close-button {
         filter: invert(1);
@@ -131,22 +133,25 @@
         height: 27px;
     }
     #trailer_container {
-        width: 100vw;
-        height: 41.5vw;
-        max-width: 564px;
-        max-height: 234px;
+        position: relative;
+        width: 100%;
+        padding-top: 41.5%;
         border: 5px solid white;
         border-radius: 25px;
         box-sizing: border-box;
         overflow: hidden;
     }
     #trailer_player_container {
+        position: absolute;
+        top: 0;
+        left: 0;
         width: 100%;
         height: 100%;
     }
     #save-box-container {
         width: 100%;
         max-width: 500px;
+        margin-bottom: 20px;
         display: flex;
         flex-direction: column;
     }
@@ -163,6 +168,23 @@
     }
     #save-box * {
         color: black !important;
+    }
+    #save-box p {
+        margin: 10px 10%;
+        font-size: 18px !important;
+        text-align: center;
+    }
+    #save-box-form {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .signup-input {
+        height: 30px;
+    }
+    .signup-button {
+        border-radius: 5px;
+        height: 35px;
     }
 </style>
 
@@ -263,9 +285,10 @@
             <div id="save-box">
                 <h1 id="save-box-title">Great choice!</h1>
                 <p id="save-box-text">Please add your email address below to save the films for later viewing</p>
-                <form id="save-box-form">
-                    <input type="email" placeholder="Email">
-                    <button type="submit">Sign up</button>
+                <form id="save-box-form" name="submit-to-google-sheet">
+                    <input class="signup-input" name="email" type="email" placeholder="Email">
+                    <input id="trailer_title_input" name="trailer_title" type="hidden">
+                    <button class="empire-btn signup-button" type="submit">Sign up</button>
                 </form>
             </div>
         </div>
@@ -307,6 +330,7 @@
 <!-- Optional plugins -->
 <script src="//cdn.flowplayer.com/releases/native/stable/plugins/hls.min.js"></script>
 <script>
+    // runs flowplayer script and sets up email save form
     window.playSelectedTrailer = () => {
         flowplayer('#trailer_player_container', {
             src: selectedFilm.mediafiles.m3u8_url,
@@ -315,6 +339,29 @@
             ratio: "564:234",
             ui: 2048,
             token: 'eyJraWQiOiJBblJBR3VYN1lNbDkiLCJ0eXAiOiJKV1QiLCJhbGciOiJFUzI1NiJ9.eyJjIjoie1wiYWNsXCI6NCxcImlkXCI6XCJBblJBR3VYN1lNbDlcIixcImRvbWFpblwiOltcInd3dy5taW51dGVzaG9ydHMuY28udWtcIixcImp1bGlhbi12aWZvci5zcXVhcmVzcGFjZS5jb21cIl19IiwiaXNzIjoiRmxvd3BsYXllciJ9.ZQ_BBs6sCSvis4skaHIeZIyGKUSGRtaGFtix7RXZh53G1QzHN8ooMdE_N-8OcuYi_ePDeL1cAAzpPTeACQ2wAQ'
+        })
+
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbzIZbj5AoBO2hP6_mxjdq0m8ttR-xtuzognpoQrurOMZUzt6PRRcsI4i0XXaVIB6A/exec'
+        const form = document.forms['submit-to-google-sheet']
+        const trailerTitleInput = document.querySelector("#trailer_title_input")
+        const saveBoxTitle = document.querySelector("#save-box-title")
+        const saveBoxText = document.querySelector("#save-box-text")
+    
+        form.addEventListener('submit', e => {
+            e.preventDefault()
+            trailerTitleInput.value = selectedFilm.name
+
+            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+                .then(response => {
+                    console.log('Success!', response)
+                    saveBoxTitle.textContent = "Thank you for signing up"
+                    saveBoxText.textContent = "Your saved films will be emailed to you. We won't contact you for anything else."
+                    form.style.display = "none"
+                })
+                .catch(error => {
+                    console.error('Error!', error.message)
+                    alert("Error posting form data. Please try again or contact an admin if the issue persists.")
+                })
         })
     }
 
@@ -378,12 +425,8 @@
             hiddenTags.push(tagParam)
 
             let filmTags = films[i].tags.split(",")
-            let tagString = ""
-            filmTags.forEach(tag => hiddenTags.every(hTag => hTag !== tag) 
-                ? tagString += `${tag}, `
-                : null
-            )
-            tags.textContent = tagString ? `(${tagString})` : ""
+            filmTags = filmTags.filter(filmTag => hiddenTags.every(hTag => hTag !== filmTag))
+            tags.textContent = filmTags[0] ? `(${filmTags.join(", ")})` : ""
         }
     }
     
@@ -396,8 +439,9 @@
     window.selectFilm = () => {
         const name = selectedFilm.name
 
-        window.location.href = `/player?id=${encodeURIComponent(filterTitle(filmName))}`
+        window.location.href = `/player?id=${encodeURIComponent(filterTitle(name))}`
     }
+
     window.filterTitle = (name) => {
         // trailer-specific part of name
         const trailerString = " Trailer"
