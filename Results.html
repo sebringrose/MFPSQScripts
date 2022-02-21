@@ -1,4 +1,4 @@
-<style>
+ <style>
     /* CUSTOM BACKGROUND */
     #siteWrapper {
         background: black;
@@ -30,7 +30,7 @@
     }
     section h1, section h2, section h3, section h4, section p {
         line-height: normal !important;
-        font-family: Lato !important;
+        font-family: Space mono !important;
         color: white !important;
     }
     section h1, section h2, section h3, section h4 {
@@ -211,8 +211,8 @@
 </style>
 
 <section id="selected-section">
-    <h1 id="selected-title" style="margin: 20px auto;">You Selected: </h1>
-    <p class="info only-mobile">Press play to watch a 30 second trailer</p>
+    <h1 id="selected-title" style="margin: 20px auto;">You selected: </h1>
+    <p class="info only-mobile">Press play to watch the film</p>
 </section>
 
 <section id="carousel-section" style="flex-wrap: nowrap;">
@@ -262,7 +262,7 @@
             <img onclick="populatePage({ new: true })" class="carousel-arrow" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_chevron.png" alt="left-arrow" style="transform: rotate(270deg);">
         </div>
     </div>
-    <p class="info hide-mobile">Press play to watch a 30 second trailer</p>
+    <p class="info hide-mobile">Press play to watch the film</p>
 </section>
 
 <section id="button-section">
@@ -285,7 +285,7 @@
 
 <!-- Overlay templates -->
 <template id="overlay-loading">
-    <img alt="loading" src="https://raw.githubusercontent.com/sebringrose/MinuteSquarespaceScripts/main/assets/Asset_loadingAnimation.gif" style="max-width: 80vw;">
+    <img alt="loading" src="https://raw.githubusercontent.com/JulianVifor/Minute-Shorts-website/main/assets/Minute_Shorts_Logo_2020_Orange__.png" style="max-width: 60vw;">
 </template>
 
 <template id="overlay-trailer">
@@ -435,13 +435,13 @@
 <!-- { shuffle: true } will reorder fresh film results and disregard whether a film is a repeat or not -->
 <script>
     window.populatePage = async (config) => {
+        // display loading animation
+        overlay("#overlay-loading")
+      
         // get tag from URL and write to selected-title
         const tagParam = decodeURIComponent(new URLSearchParams(window.location.search).get('t'))
         if (!tagParam || tagParam === "null") return alert("No film tag provided. Please go to home page and select an option.")
         document.querySelector("#selected-title").textContent = `You Selected: ${tagParam}`
-
-        // display loading animation
-        overlay("#overlay-loading")
 
         let films = await getFilms(tagParam, config)
         console.log('getFilms returned films', films)
@@ -461,7 +461,8 @@
             poster.style.backgroundImage = `url(${films[i].images.normal_image_url})`
             poster.onclick = () => {
                 window.selectedFilm = films[i]
-                overlay("#overlay-trailer", playSelectedTrailer)
+               // overlay("#overlay-trailer", playSelectedTrailer)
+              selectFilm()
             }
 
             const title = document.querySelector(`#result-${i+1}-title`)
@@ -479,16 +480,10 @@
 
     window.getFilms = async (tag, config) => {
         console.log('getting films with', config)
-        let prevFilms = localStorage.getItem('results') ? JSON.parse(localStorage.getItem('results')).films : null
-
-        // check we have valid previous films and that they match the selected tag
-        // only use previous films if config.shuffle argument === false
-        if ((!config || (!config.new && !config.shuffle)) && prevFilms && prevFilms.every(prevFilm => prevFilm && prevFilm.tags && prevFilm.tags.includes(tag))) {
-            return prevFilms
-        }
+        let prevFilms = sessionStorage.getItem('results') ? JSON.parse(sessionStorage.getItem('results')).films : []
 
         // fetches set of film trailers that match tag
-        let films = await fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${encodeURIComponent(tag)},film_trailer&pageSize=6`)
+        let films = await fetch(`https://flowplayer-middleware.azurewebsites.net/api/getVideo?code=71QIkhIZbREwZek4nRNjIjSsWJcu7GAbKncFKnz30JGviBDCxokuog%3D%3D&tags=${encodeURIComponent(tag)},film_trailer`)
             .then(response => response.json())
         
         // alert user if no matching films found
@@ -503,14 +498,21 @@
                 .sort((a, b) => a.sort - b.sort)
                 .map((a) => a.value)
         }
-
-        // remove any repeat results if new config attribute is true (only if we have enough results)
-        if (config && config.new && prevFilms && prevFilms.every(prevFilm => prevFilm && prevFilm.id) && films.length > prevFilms.length) {
+      
+        // remove any repeat results if new config attribute is true
+        if (config && config.new && prevFilms && prevFilms.every(prevFilm => prevFilm && prevFilm.id)) {
             films = films.filter(film => {
                 return !prevFilms.some(prevFilm => {
                     return film.name === prevFilm.name
                 })
             })
+        }
+
+        // no new films remaining - don't store for filters just reset
+        if (films.length < 4) {
+            sessionStorage.removeItem("results")
+
+            return films
         }
         
         // return only 3 items
@@ -519,11 +521,14 @@
         // store tag and film results in localStorage.
         // this is used to make sure not to display repeat options on shuffle
         // and to correctly route back to same results from player page.
-        localStorage.setItem('results', JSON.stringify({ tag, films }))
+        sessionStorage.setItem('results', JSON.stringify({ tag, films: [ ...prevFilms, ...films ] }))
 
         return films
     }
     
     // initial page load
+    // first clear results from last session
+    sessionStorage.removeItem("results")
+  
     populatePage({ shuffle: false, new: false })
 </script>
